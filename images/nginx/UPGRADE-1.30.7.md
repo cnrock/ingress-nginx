@@ -75,6 +75,18 @@ podman run --rm <controller-image> /usr/local/nginx/sbin/nginx -v   # expect 1.3
 # or check the controller binary's built-in version output
 ```
 
+## Verification done so far
+
+- Patch round-trip: the new patch set applied to pristine 1.30.7 reproduces
+  the patched tree exactly (0 diff lines).
+- Native smoke build (2026-11-19, this repo's patched tree, built-in modules
+  only: SSL, HTTP/2, stream, threads, PCRE-JIT): `configure` + `make` clean,
+  binary reports `nginx/1.30.7`.
+- Runtime check: config using `log_escape_non_ascii off;`, an HTTP/2 server
+  and a stream proxy passes `nginx -t` and serves live requests.
+- Still to verify in the full image build: the third-party modules
+  (lua-nginx-module, ModSecurity, geoip2, njs, OpenTelemetry) and HTTP/3.
+
 ## Updating next time
 
 1. Bump `NGINX_VERSION` in `images/nginx/rootfs/build.sh` and update the
