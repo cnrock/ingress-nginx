@@ -91,8 +91,15 @@ podman run --rm <controller-image> /usr/local/nginx/sbin/nginx -v   # expect 1.3
   binary reports `nginx/1.30.7`.
 - Runtime check: config using `log_escape_non_ascii off;`, an HTTP/2 server
   and a stream proxy passes `nginx -t` and serves live requests.
-- Still to verify in the full image build: the third-party modules
-  (lua-nginx-module, ModSecurity, geoip2, njs, OpenTelemetry) and HTTP/3.
+- Full image build (2026-11-19): all third-party modules compiled unchanged
+  against 1.30.7 — no module version bumps were needed (including
+  lua-nginx-module v0.10.28, ModSecurity, geoip2, njs, OpenTelemetry).
+  Built images, verified (`nginx/1.30.7`, controller reports
+  `v1.15.1-nginx1.30.7`) and pushed to Docker Hub:
+  `cnrock/ingress-nginx-base:1.30.7` (205 MB,
+  sha256:48eaf9ffc53e16272cc54310b3172501ab254abe08d6c7962f4c6b9b488914e5)
+  and `cnrock/ingress-nginx-controller:1.30.7` (341 MB,
+  sha256:83052326ff41fb6ec226f530c6c88e1c6de7e10cfc5eb05149e1561242bd3087).
 
 ## Updating next time
 
