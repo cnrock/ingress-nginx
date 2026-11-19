@@ -51,6 +51,13 @@ CVE-2026-123007 and CVE-2026-123633.
      1.30.7 (see `handshake_rejected` handling in
      `src/http/ngx_http_request.c` and `src/stream/ngx_stream_ssl_module.c`).
 3. `images/nginx/TAG` bumped to `v2.3.0` for the rebuilt base image.
+4. `build.sh`'s `get_src` now actually verifies SHA-256 checksums (upstream
+   had the check commented out): any source whose recorded hash is a real
+   64-hex value is verified after download and the build aborts on mismatch;
+   sources still carrying the `abc123` placeholder are skipped. If a build
+   ever aborts on a GitHub archive whose hash changed because GitHub
+   recompressed it, update that source's hash in `build.sh` after verifying
+   the new tarball.
 
 No third-party module versions were changed. If the build surfaces a module
 that no longer compiles against 1.30.7 (lua-nginx-module is the usual
