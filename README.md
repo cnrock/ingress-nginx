@@ -1,3 +1,24 @@
+# Fork Notice (cnrock)
+
+This repository is a fork of the retired upstream `kubernetes/ingress-nginx`,
+maintained for one purpose: keeping the bundled NGINX current against
+critical vulnerabilities after upstream end-of-life.
+
+**2026-11-19 — NGINX upgraded 1.27.1 → 1.30.7** to fix the NGINX2Root RCE
+cluster disclosed 2026-11-18: CVE-2026-123007, CVE-2026-123633,
+CVE-2026-123634, CVE-2026-121810, CVE-2026-113425. The controller code is
+unchanged from upstream v1.15.1 and third-party module versions are
+unchanged; all NGINX core patches were rebased onto 1.30.7. Full details,
+verification record and rebuild steps:
+[images/nginx/UPGRADE-1.30.7.md](images/nginx/UPGRADE-1.30.7.md).
+
+Images built from this fork (Docker Hub):
+
+- `cnrock/ingress-nginx-controller:1.30.7` (controller reports `v1.15.1-nginx1.30.7`)
+- `cnrock/ingress-nginx-base:1.30.7`
+
+---
+
 # Ingress NGINX Retirement
 
 ## Retiring
@@ -47,8 +68,14 @@ For detailed changes on the `ingress-nginx` helm chart, please check the changel
 Supported versions for the ingress-nginx project mean that we have completed E2E tests, and they are passing for
 the versions listed. Ingress-Nginx versions **may** work on older versions, but the project does not make that guarantee.
 
+The first row below is this fork's build: the same controller and Kubernetes
+version range as upstream v1.15.1, with only the NGINX version changed to
+1.30.7 (see the fork notice at the top). It has not been run through
+upstream's E2E suite.
+
 | Supported | Ingress-NGINX version | k8s supported version         | Alpine Version | Nginx Version | Helm Chart Version |
 | :-------: | --------------------- | ----------------------------- | -------------- | ------------- | ------------------ |
+|   fork    | **v1.15.1-nginx1.30.7** | 1.35, 1.34, 1.33, 1.32, 1.31  | 3.23.3         | 1.30.7        | 4.15.1             |
 |    🔄     | **v1.15.1**           | 1.35, 1.34, 1.33, 1.32, 1.31  | 3.23.3         | 1.27.1        | 4.15.1             |
 |    🔄     | **v1.15.0**           | 1.35, 1.34, 1.33, 1.32, 1.31  | 3.23.3         | 1.27.1        | 4.15.0             |
 |    🔄     | **v1.14.5**           | 1.34, 1.33, 1.32, 1.31, 1.30  | 3.23.3         | 1.27.1        | 4.14.5             |
