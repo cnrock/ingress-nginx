@@ -8,10 +8,10 @@ entries:
       artifacthub.io/prerelease: "false"
     apiVersion: v2
     appVersion: 1.15.1
-    created: "2026-11-26T13:51:01.871720925+08:00"
+    created: "2026-11-26T14:16:26.92856094+08:00"
     description: Ingress controller for Kubernetes using NGINX as a reverse proxy
       and load balancer
-    digest: cb9fb9cf1fd4c68e9c82d7918c31747670e016ef355daf120ef8d8db2bb7f1b7
+    digest: 4e4a6a670f92a6977c1998cb2ad56956f85cd1315aa3d3a84be8dda175a35dd1
     home: https://github.com/kubernetes/ingress-nginx
     icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/500px-Nginx_logo.svg.png
     keywords:
@@ -19,14 +19,12 @@ entries:
     - nginx
     kubeVersion: '>=1.21.0-0'
     maintainers:
-    - name: cpanato
-    - name: Gacko
-    - name: strongjz
-    - name: tao12345666333
+    - name: cnrock
+      url: https://github.com/cnrock
     name: ingress-nginx
     sources:
     - https://github.com/kubernetes/ingress-nginx
     urls:
-    - https://cnrock.github.io/ingress-nginx/ingress-nginx-4.15.1-cnrock.1.tgz
-    version: 4.15.1-cnrock.1
-generated: "2026-11-26T13:51:01.864441741+08:00"
+    - https://cnrock.github.io/ingress-nginx/ingress-nginx-4.15.1-cnrock.2.tgz
+    version: 4.15.1-cnrock.2
+generated: "2026-11-26T14:16:26.923184812+08:00"
