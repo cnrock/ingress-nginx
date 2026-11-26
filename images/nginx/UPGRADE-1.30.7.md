@@ -113,7 +113,7 @@ podman run --rm <controller-image> /usr/local/nginx/sbin/nginx -v   # expect 1.3
 
 ## Helm chart (fork, 2026-11-26)
 
-The fork's chart (`charts/ingress-nginx`, version `4.15.1-cnrock.1`,
+The fork's chart (`charts/ingress-nginx`, version `4.15.1-cnrock.2`,
 appVersion `1.15.1`) defaults the controller image to
 `cnrock/ingress-nginx-controller:1.30.7` (`controller.image.repository` /
 `tag` in `values.yaml`, digest intentionally empty — the fork image is
@@ -160,7 +160,7 @@ the image — a rollback restores the old chart values (old image).
 
 ### Online: Helm repo on GitHub Pages
 
-The packaged chart (`ingress-nginx-4.15.1-cnrock.1.tgz`) and `index.yaml`
+The packaged chart (`ingress-nginx-4.15.1-cnrock.2.tgz`) and `index.yaml`
 live on the `gh-pages` branch, served as a Helm repository at
 https://cnrock.github.io/ingress-nginx/.
 
@@ -173,11 +173,11 @@ Until Pages is enabled the repo URL 404s.
 helm repo add cnrock-ingress https://cnrock.github.io/ingress-nginx
 helm repo update
 helm install ingress-nginx cnrock-ingress/ingress-nginx \
-  --version 4.15.1-cnrock.1 \
+  --version 4.15.1-cnrock.2 \
   --namespace ingress --create-namespace
 ```
 
-`--version` is required: `4.15.1-cnrock.1` is a prerelease version, so
+`--version` is required: `4.15.1-cnrock.2` is a prerelease version, so
 `helm search repo` hides it by default (use `--devel` to list it) and a
 plain `helm install` without `--version` fails with "no chart version
 found". Verify after install:
@@ -190,7 +190,7 @@ kubectl get deploy -n ingress ingress-nginx-controller \
 ```
 
 For upgrades from the fork repo, use the same chart reference
-(`cnrock-ingress/ingress-nginx --version 4.15.1-cnrock.1`) with the
+(`cnrock-ingress/ingress-nginx --version 4.15.1-cnrock.2`) with the
 values-file procedure in the "Helm chart" section above — do not use
 `--reuse-values` for the reasons given there.
 
@@ -200,8 +200,8 @@ No Helm repo is needed. Download the chart package on any machine with
 internet (or clone this repo and run `helm package charts/ingress-nginx`):
 
 ```bash
-curl -LO https://cnrock.github.io/ingress-nginx/ingress-nginx-4.15.1-cnrock.1.tgz
-helm install ingress-nginx ./ingress-nginx-4.15.1-cnrock.1.tgz \
+curl -LO https://cnrock.github.io/ingress-nginx/ingress-nginx-4.15.1-cnrock.2.tgz
+helm install ingress-nginx ./ingress-nginx-4.15.1-cnrock.2.tgz \
   --namespace ingress --create-namespace
 ```
 
@@ -229,7 +229,7 @@ Then install from the local package with the image addresses overridden
 valid):
 
 ```bash
-helm install ingress-nginx ./ingress-nginx-4.15.1-cnrock.1.tgz \
+helm install ingress-nginx ./ingress-nginx-4.15.1-cnrock.2.tgz \
   --namespace ingress --create-namespace \
   --set controller.image.repository=<internal-registry>/ingress-nginx-controller \
   --set controller.admissionWebhooks.patch.image.repository=<internal-registry>/kube-webhook-certgen

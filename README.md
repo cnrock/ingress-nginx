@@ -22,10 +22,10 @@ One-line install from this fork's Helm repo (GitHub Pages, `gh-pages` branch):
 ```bash
 helm repo add cnrock-ingress https://cnrock.github.io/ingress-nginx
 helm install ingress-nginx cnrock-ingress/ingress-nginx \
-  --version 4.15.1-cnrock.1 --namespace ingress --create-namespace
+  --version 4.15.1-cnrock.2 --namespace ingress --create-namespace
 ```
 
-`--version` is required: `4.15.1-cnrock.1` is a prerelease version, so Helm
+`--version` is required: `4.15.1-cnrock.2` is a prerelease version, so Helm
 will not select it by default. Offline install and image mirroring for
 air-gapped clusters are documented in
 [images/nginx/UPGRADE-1.30.7.md](images/nginx/UPGRADE-1.30.7.md)
@@ -89,7 +89,7 @@ upstream's E2E suite.
 
 | Supported | Ingress-NGINX version | k8s supported version         | Alpine Version | Nginx Version | Helm Chart Version |
 | :-------: | --------------------- | ----------------------------- | -------------- | ------------- | ------------------ |
-|   fork    | **v1.15.1-nginx1.30.7** | 1.35, 1.34, 1.33, 1.32, 1.31  | 3.23.3         | 1.30.7        | 4.15.1-cnrock.1    |
+|   fork    | **v1.15.1-nginx1.30.7** | 1.35, 1.34, 1.33, 1.32, 1.31  | 3.23.3         | 1.30.7        | 4.15.1-cnrock.2    |
 |    🔄     | **v1.15.1**           | 1.35, 1.34, 1.33, 1.32, 1.31  | 3.23.3         | 1.27.1        | 4.15.1             |
 |    🔄     | **v1.15.0**           | 1.35, 1.34, 1.33, 1.32, 1.31  | 3.23.3         | 1.27.1        | 4.15.0             |
 |    🔄     | **v1.14.5**           | 1.34, 1.33, 1.32, 1.31, 1.30  | 3.23.3         | 1.27.1        | 4.14.5             |

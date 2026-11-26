@@ -14,11 +14,9 @@ keywords:
 - nginx
 kubeVersion: '>=1.21.0-0'
 maintainers:
-- name: cpanato
-- name: Gacko
-- name: strongjz
-- name: tao12345666333
+- name: cnrock
+  url: https://github.com/cnrock
 name: ingress-nginx
 sources:
 - https://github.com/kubernetes/ingress-nginx
-version: 4.15.1-cnrock.1
+version: 4.15.1-cnrock.2
