@@ -29,10 +29,13 @@ controller:
     image: ingress-nginx/controller
     ## for backwards compatibility consider setting the full image url via the repository value below
     ## use *either* current default registry/image or repository format or installing chart by providing the values.yaml will fail
-    ## repository:
-    tag: "v1.15.1"
-    digest: sha256:594ceea76b01c592858f803f9ff4d2cb40542cae2060410b2c95f75907d659e1
-    digestChroot: sha256:af31d00c9d82c612896b380a9003bd36843b7647b98e4588251c66325317bc72
+    ## Fork build (cnrock): use the nginx 1.30.7 image built from this repo instead of
+    ## the upstream registry.k8s.io/ingress-nginx/controller:v1.15.1 (nginx 1.27.1).
+    ## digest is intentionally empty: the fork image is referenced by tag only.
+    repository: cnrock/ingress-nginx-controller
+    tag: "1.30.7"
+    digest: ""
+    digestChroot: ""
     pullPolicy: IfNotPresent
     runAsNonRoot: true
     # -- This value must not be changed using the official image.

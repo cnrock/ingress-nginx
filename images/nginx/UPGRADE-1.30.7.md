@@ -110,3 +110,37 @@ podman run --rm <controller-image> /usr/local/nginx/sbin/nginx -v   # expect 1.3
    that now fails is either upstreamed (drop it, after verifying the fix is
    in the new source) or needs a hand rebase like patch 19 above.
 3. Bump `images/nginx/TAG`, rebuild base + controller, re-verify `nginx -v`.
+
+## Helm chart (fork, 2026-11-26)
+
+The fork's chart (`charts/ingress-nginx`, version `4.15.1-cnrock.1`,
+appVersion `1.15.1`) defaults the controller image to
+`cnrock/ingress-nginx-controller:1.30.7` (`controller.image.repository` /
+`tag` in `values.yaml`, digest intentionally empty — the fork image is
+referenced by tag only). Upgrading the chart also installs the v1.15.1
+RBAC, which includes the `discovery.k8s.io/endpointslices` get/list/watch
+rule the old (v1.12-era) manifests lack — that rule is required because
+v1.15.1 resolves upstreams exclusively via EndpointSlices.
+
+Upgrade from the fork chart directory, keeping the release's existing
+values, and make sure the values carry the node pinning for the dedicated
+ingress node — a plain `helm upgrade` rewrites the Deployment, so a
+nodeSelector applied earlier with `kubectl patch` would be lost:
+
+```bash
+helm list -n ingress            # confirm release name + chart version
+helm get values <release> -n ingress -a > old-values.yaml   # audit: image overrides? nodeSelector?
+helm upgrade <release> ./charts/ingress-nginx -n ingress \
+  -f old-values.yaml \
+  --set controller.nodeSelector.<label-key>=<label-value> \
+  --wait
+kubectl get pods -n ingress -o wide   # new pod must land on the dedicated node
+kubectl get deploy -n ingress ingress-nginx-oadc-controller \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
+```
+
+Notes: `--reuse-values` is not recommended for this jump — old values may
+pin an image (`controller.image.tag: v1.12.3` or similar) that would
+override the chart's new default. Prefer an explicit values file. Do not
+`helm rollback` to the pre-upgrade revision afterwards without re-checking
+the image — a rollback restores the old chart values (old image).
