@@ -129,9 +129,15 @@ nodeSelector applied earlier with `kubectl patch` would be lost:
 
 ```bash
 helm list -n ingress            # confirm release name + chart version
-helm get values <release> -n ingress -a > old-values.yaml   # audit: image overrides? nodeSelector?
+# Audit only — DO NOT feed this file back with -f (see note below).
+helm get values <release> -n ingress -a > old-values.yaml   # image overrides? nodeSelector?
+# Carry forward ONLY non-image custom values from the audit into a small
+# hand-built file (e.g. custom-values.yaml); delete any controller.image
+# block — the new chart default is the 1.30.7 image.
 helm upgrade <release> ./charts/ingress-nginx -n ingress \
-  -f old-values.yaml \
+  -f custom-values.yaml \
+  --set controller.image.repository=cnrock/ingress-nginx-controller \
+  --set controller.image.tag=1.30.7 \
   --set controller.nodeSelector.<label-key>=<label-value> \
   --wait
 kubectl get pods -n ingress -o wide   # new pod must land on the dedicated node
@@ -141,6 +147,11 @@ kubectl get deploy -n ingress ingress-nginx-oadc-controller \
 
 Notes: `--reuse-values` is not recommended for this jump — old values may
 pin an image (`controller.image.tag: v1.12.3` or similar) that would
-override the chart's new default. Prefer an explicit values file. Do not
+override the chart's new default. The same trap applies to
+`-f old-values.yaml` after `helm get values -a`: `-a` dumps COMPUTED
+VALUES, i.e. the old chart's defaults merged in, so that file itself
+contains the old image repository/tag — feeding it back would reinstall
+the old (vulnerable) image while looking like a successful upgrade.
+Prefer an explicit values file. Do not
 `helm rollback` to the pre-upgrade revision afterwards without re-checking
 the image — a rollback restores the old chart values (old image).
