@@ -155,3 +155,33 @@ the old (vulnerable) image while looking like a successful upgrade.
 Prefer an explicit values file. Do not
 `helm rollback` to the pre-upgrade revision afterwards without re-checking
 the image — a rollback restores the old chart values (old image).
+
+## Upstream continuation — Chainguard fork (reference, 2026-11-26)
+
+Upstream `kubernetes/ingress-nginx` was archived 2026-03-24 and ships no
+more fixes. The maintained continuation is Chainguard's EmeritOSS fork:
+https://github.com/chainguard-forks/ingress-nginx
+(self-described as "a supported replacement of the original repository";
+best-effort security fixes only, no community contributions, no free
+pre-built images or charts — you build and host images yourself;
+hardened images are a commercial cgr.dev offering).
+
+Why it matters for this fork:
+
+- Its release `controller-v1.15.16` does the same NGINX2Root fix a
+  different way: it **backports the nginx 1.30.7 security fixes onto
+  1.27.1** (PR #67) instead of upgrading nginx. Chainguard's own advisory
+  confirms that build fixes all five NGINX2Root CVEs — an independent
+  cross-check that the five CVEs we fixed are the right set. Note their
+  image still reports `nginx/1.27.1` in its banner: backported fixes do
+  not show in the version string.
+- This fork's approach (a real 1.30.7 upgrade) is the cleaner one: the
+  genuine upstream release, an honest version string, and every module
+  recompiled against 1.30.7, so there is no ABI drift. The Chainguard
+  backports add fields to core nginx structs (e.g. a `send_queued`
+  counter for CVE-2026-123007), so a third-party dynamic module built
+  against stock nginx could be ABI-incompatible with their image.
+- For the next nginx CVE there will be no official ingress-nginx
+  release. Watch this fork's `images/nginx/rootfs/patches/` — that is
+  where future backports will land, and the place to cherry-pick from
+  when the next fix is needed here.
