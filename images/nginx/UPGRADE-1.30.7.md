@@ -156,6 +156,107 @@ Prefer an explicit values file. Do not
 `helm rollback` to the pre-upgrade revision afterwards without re-checking
 the image — a rollback restores the old chart values (old image).
 
+## Installing from the fork chart — online (Helm repo) and offline
+
+### Online: Helm repo on GitHub Pages
+
+The packaged chart (`ingress-nginx-4.15.1-cnrock.1.tgz`) and `index.yaml`
+live on the `gh-pages` branch, served as a Helm repository at
+https://cnrock.github.io/ingress-nginx/.
+
+Prerequisite (one-time, in the GitHub web UI): repo **Settings → Pages →
+Build and deployment → Branch: `gh-pages`** → Save. Wait about a minute,
+then confirm https://cnrock.github.io/ingress-nginx/index.yaml loads.
+Until Pages is enabled the repo URL 404s.
+
+```bash
+helm repo add cnrock-ingress https://cnrock.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx cnrock-ingress/ingress-nginx \
+  --version 4.15.1-cnrock.1 \
+  --namespace ingress --create-namespace
+```
+
+`--version` is required: `4.15.1-cnrock.1` is a prerelease version, so
+`helm search repo` hides it by default (use `--devel` to list it) and a
+plain `helm install` without `--version` fails with "no chart version
+found". Verify after install:
+
+```bash
+kubectl get pods -n ingress -o wide
+kubectl get deploy -n ingress ingress-nginx-controller \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
+# expect: cnrock/ingress-nginx-controller:1.30.7
+```
+
+For upgrades from the fork repo, use the same chart reference
+(`cnrock-ingress/ingress-nginx --version 4.15.1-cnrock.1`) with the
+values-file procedure in the "Helm chart" section above — do not use
+`--reuse-values` for the reasons given there.
+
+### Offline: packaged chart + mirrored images
+
+No Helm repo is needed. Download the chart package on any machine with
+internet (or clone this repo and run `helm package charts/ingress-nginx`):
+
+```bash
+curl -LO https://cnrock.github.io/ingress-nginx/ingress-nginx-4.15.1-cnrock.1.tgz
+helm install ingress-nginx ./ingress-nginx-4.15.1-cnrock.1.tgz \
+  --namespace ingress --create-namespace
+```
+
+That covers the chart. A fully air-gapped cluster also needs the
+**images** mirrored, because the chart pulls them from Docker Hub and
+`registry.k8s.io` by default. On an internet-connected machine:
+
+```bash
+docker pull cnrock/ingress-nginx-controller:1.30.7
+docker pull registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9
+docker save cnrock/ingress-nginx-controller:1.30.7 \
+  registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9 \
+  -o ingress-images.tar
+# On the offline side, after docker load -i ingress-images.tar:
+docker tag cnrock/ingress-nginx-controller:1.30.7 \
+  <internal-registry>/ingress-nginx-controller:1.30.7
+docker tag registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9 \
+  <internal-registry>/kube-webhook-certgen:v1.6.9
+docker push <internal-registry>/ingress-nginx-controller:1.30.7
+docker push <internal-registry>/kube-webhook-certgen:v1.6.9
+```
+
+Then install from the local package with the image addresses overridden
+(retagging preserves digests, so the chart's tag/digest defaults stay
+valid):
+
+```bash
+helm install ingress-nginx ./ingress-nginx-4.15.1-cnrock.1.tgz \
+  --namespace ingress --create-namespace \
+  --set controller.image.repository=<internal-registry>/ingress-nginx-controller \
+  --set controller.admissionWebhooks.patch.image.repository=<internal-registry>/kube-webhook-certgen
+```
+
+Notes: `defaultBackend` is disabled by default; if you enable it, mirror
+`registry.k8s.io/ingress-nginx/defaultbackend-amd64` as well
+(`defaultBackend.image.repository`). The dedicated-ingress-node pinning
+(`controller.nodeSelector`) still applies offline — put it in the values
+file as described in the "Helm chart" section.
+
+### Republishing the repo after a chart change
+
+```bash
+git worktree add /tmp/ghpages gh-pages
+helm package charts/ingress-nginx -d /tmp/ghpages
+helm repo index /tmp/ghpages --url https://cnrock.github.io/ingress-nginx \
+  --merge /tmp/ghpages/index.yaml
+cd /tmp/ghpages && git add . \
+  && git commit -m "helm repo: publish chart <version>" \
+  && git push cnrock gh-pages
+git worktree remove --force /tmp/ghpages
+```
+
+`--merge` keeps older chart versions in the index, so one repo serves
+every published fork chart version.
+
 ## Upstream continuation — Chainguard fork (reference, 2026-11-26)
 
 Upstream `kubernetes/ingress-nginx` was archived 2026-03-24 and ships no

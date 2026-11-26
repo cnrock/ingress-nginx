@@ -17,6 +17,20 @@ Images built from this fork (Docker Hub):
 - `cnrock/ingress-nginx-controller:1.30.7` (controller reports `v1.15.1-nginx1.30.7`)
 - `cnrock/ingress-nginx-base:1.30.7`
 
+One-line install from this fork's Helm repo (GitHub Pages, `gh-pages` branch):
+
+```bash
+helm repo add cnrock-ingress https://cnrock.github.io/ingress-nginx
+helm install ingress-nginx cnrock-ingress/ingress-nginx \
+  --version 4.15.1-cnrock.1 --namespace ingress --create-namespace
+```
+
+`--version` is required: `4.15.1-cnrock.1` is a prerelease version, so Helm
+will not select it by default. Offline install and image mirroring for
+air-gapped clusters are documented in
+[images/nginx/UPGRADE-1.30.7.md](images/nginx/UPGRADE-1.30.7.md)
+("Installing from the fork chart").
+
 ---
 
 # Ingress NGINX Retirement
